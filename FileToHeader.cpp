@@ -52,14 +52,16 @@ int main(int argc, char* argv[]) {
 			return 5;
 		}
 
-		// Get the filename we'll be working with and turn any '.' into '_'.
+		// Get the filename we'll be working with and turn any '.' or ' ' into '_'.
 		string filename = mypath.filename().u8string();
 		cout << "Writing file '" << filename << "' to '" << filename << ".h'...   ";
 		for (char& c : filename) {
-			if (c == '.') { c = '_'; }
+			if (c == '.' || c == ' ') { c = '_'; }
 		}
 
 		// Write the data to the output file.
+		outfile << "#ifndef FILE_" << filename << "_H\n";
+		outfile << "#define FILE_" << filename << "_H\n";
 		outfile << "#define FILE_" << filename << "_SIZE " << filedata.size() << "\n";
 		outfile << "static const unsigned char FILE_" << filename << "_DATA[] = {\n";
 
@@ -81,7 +83,8 @@ int main(int argc, char* argv[]) {
 			if (i + 1 < filedata.size()) { outfile << ","; }
 			chars_written_this_line += chars_needed;
 		}
-		outfile << "\n};";
+		outfile << "\n};\n";
+		outfile << "#endif // FILE_" << filename << "_H\n";
 		cout << "done!\n";
 	}
 
