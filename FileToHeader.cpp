@@ -15,25 +15,26 @@ int main(int argc, char* argv[]) {
 	// Make sure we actually have an arg to use.
 	if (argc < 2) {
 		cout << "Not enough arguments.\n";
-		return 1;
+		return 2;
 	}
 
 	// Go through each file that was given.
 	for (int whicharg = 1; whicharg < argc; ++whicharg)
 	{
+		cout << "Writing file '" << argv[whicharg] << "' to '" << argv[whicharg] << ".h'...   ";
 
 		// Turn argv[i] into a file path.
 		filesystem::path mypath(argv[whicharg]);
 		if (!filesystem::is_regular_file(mypath)) {
 			cout << "Not a regular file.\n";
-			return 2;
+			continue;
 		}
 
 		// Open the file and get its size.
 		ifstream infile(mypath, ios::in | ios::binary);
 		if (!infile.is_open()) {
 			cout << "Can't open input file.\n";
-			return 3;
+			continue;
 		}
 
 		// Read the file data.
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
 		vector<char> filedata(size);
 		if (!infile.read(filedata.data(), size)) {
 			cout << "Failed to read input file.\n";
-			return 4;
+			continue;
 		}
 
 		// Open the output file.
@@ -49,12 +50,11 @@ int main(int argc, char* argv[]) {
 		ofstream outfile(outpath, ios::out);
 		if (!outfile.is_open()) {
 			cout << "Can't open output file.\n";
-			return 5;
+			continue;
 		}
 
 		// Get the filename we'll be working with and turn any '.' or ' ' into '_'.
 		string filename = mypath.filename().u8string();
-		cout << "Writing file '" << filename << "' to '" << filename << ".h'...   ";
 		for (char& c : filename) {
 			if (c == '.' || c == ' ') { c = '_'; }
 		}
@@ -87,9 +87,6 @@ int main(int argc, char* argv[]) {
 		outfile << "#endif // FILE_" << filename << "_H\n";
 		cout << "done!\n";
 	}
-
-	
-
 
 	return 0;
 }
